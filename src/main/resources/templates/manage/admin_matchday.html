@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+<header class="topbar">
+    <nav class="navbar navbar-expand">
+        <div class="container page-container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold"
+               th:href="@{/admin}">
+                <span class="brand-mark"><i class="bi bi-trophy-fill"></i></span>
+                <span>Game Day</span>
+            </a>
+
+            <!-- Spring Security: configura /logout como POST -->
+            <form th:action="@{/logout}" method="post" class="ms-auto">
+                <input type="hidden" th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="container page-container py-4 py-lg-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item">
+                <a th:href="@{/admin/tournament}" class="text-decoration-none">
+                    Competencia
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a th:href="@{/admin/tournament/{tournamentId}(tournamentId=${tournamentId})}"
+                   class="text-decoration-none">
+                    Administrar torneo
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Administrar jornada
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Encabezado -->
+    <section class="d-flex flex-column flex-sm-row justify-content-between
+                    align-items-sm-end gap-3 mb-4">
+        <div>
+            <!-- <div class="text-success fw-semibold small text-uppercase mb-2">
+                <i class="bi bi-calendar3 me-1"></i>
+                Jornada del torneo
+            </div> -->
+            <h1 class="page-title h2 mb-1"
+                th:text="${matchday.name}">Jornada 1</h1>
+            <!-- Se asume que MatchdayDto expone name y date -->
+            <p class="text-secondary mb-0">
+                <i class="bi bi-calendar-event me-1"></i>
+                <span th:text="${matchday.date}">Fecha de la jornada</span>
+            </p>
+        </div>
+
+        <div class="d-flex page-heading-actions">
+            <button type="button" class="btn btn-success"
+                    data-bs-toggle="modal" data-bs-target="#addMatchModal">
+                <i class="bi bi-plus-lg me-1"></i>
+                Agregar partido
+            </button>
+        </div>
+    </section>
+
+    <!-- Mensajes flash opcionales -->
+    <div th:if="${message}" class="alert alert-success alert-dismissible fade show"
+         role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                aria-label="Cerrar"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                aria-label="Cerrar"></button>
+    </div>
+
+    <!-- Partidos -->
+    <section class="card content-card">
+        <div class="card-body p-0">
+            <div class="d-flex justify-content-between align-items-center
+                        flex-wrap gap-2 p-3 p-md-4 border-bottom">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">Partidos de la jornada</h2>
+                    <p class="text-secondary small mb-0">
+                        Consulta los resultados y administra cada encuentro.
+                    </p>
+                </div>
+                <span class="badge rounded-pill text-bg-light border text-secondary"
+                      th:text="${#lists.size(matches)} + ' partidos'">0 partidos</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th scope="col">Finalizado</th>
+                        <th scope="col" class="text-end">Local</th>
+                        <th scope="col" class="text-center">Marcador</th>
+                        <th scope="col">Visitante</th>
+                        <th scope="col" class="text-end">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="match : ${matches}">
+                        <!-- Se asume MatchDto: played, homeTeam.name, awayTeam.name,
+                             homeGoals, awayGoals e id -->
+                        <td>
+                            <span th:if="${match.played}"
+                                  class="status-pill status-finished">
+                                <i class="bi bi-check-circle-fill"></i> Sí
+                            </span>
+                            <span th:unless="${match.played}"
+                                  class="status-pill status-pending">
+                                <i class="bi bi-clock-fill"></i> No
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <span class="team-name"
+                                  th:text="${match.homeTeamName}"></span>
+                        </td>
+                        <td class="text-center">
+                            <span class="match-time">
+                                <i class="bi bi-clock"></i>
+                                <span th:text="${#temporals.format(match.date, 'HH:mm')}">
+                                    00:00
+                                </span>
+                            </span>
+                            <span class="score"
+                                  th:text="${match.homeGoals + ' - ' + match.awayGoals}">
+                            </span>
+                        </td>
+                        <td>
+                            <span class="team-name"
+                                  th:text="${match.awayTeamName}"></span>
+                        </td>
+                        <td>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   th:href="@{/admin/match/{matchId}(matchId=${match.id})}"
+                                   title="Editar partido" aria-label="Editar partido">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span class="d-none d-lg-inline ms-1">Editar</span>
+                                </a>
+
+                                <!-- Ajusta la URL al mapping de eliminación de tu controlador. -->
+                                <form th:action="@{/admin/match/{matchId}/delete-match(matchId=${match.id})}"
+                                      method="post"
+                                      onsubmit="return confirm('¿Seguro que deseas eliminar este partido?');">
+                                    <input type="hidden" th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden" name="matchdayId" th:value="${matchday.id}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            title="Eliminar partido" aria-label="Eliminar partido">
+                                        <i class="bi bi-trash3"></i>
+                                        <span class="d-none d-lg-inline ms-1">Eliminar</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(matches)}">
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <span class="empty-state-icon">
+                                    <i class="bi bi-calendar2-plus"></i>
+                                </span>
+                                <h3 class="h6 fw-bold text-dark">Todavía no hay partidos</h3>
+                                <p class="small mb-3">
+                                    Agrega el primer encuentro para esta jornada.
+                                </p>
+                                <button type="button" class="btn btn-success btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#addMatchModal">
+                                    <i class="bi bi-plus-lg me-1"></i> Agregar partido
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Modal: agregar partido -->
+<div class="modal fade" id="addMatchModal" tabindex="-1"
+     aria-labelledby="addMatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form th:action="@{/admin/match/register-match}"
+                  th:object="${matchForm}" method="post">
+                <input type="hidden" th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <div class="text-success small fw-semibold mb-1">
+                            <i class="bi bi-plus-circle me-1"></i> Nuevo encuentro
+                        </div>
+                        <h2 class="modal-title fs-5 fw-bold" id="addMatchModalLabel">
+                            Agregar partido
+                        </h2>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body py-4">
+                    <div class="mb-3">
+                        <label for="homeTeamId" class="form-label">Equipo local</label>
+                        <select id="homeTeamId" class="form-select"
+                                th:field="*{homeTeamId}" required>
+                            <option value="" disabled>Selecciona el equipo local</option>
+                            <!-- Se asume que TeamDto expone id y name -->
+                            <option th:each="team : ${teams}"
+                                    th:value="${team.id}"
+                                    th:text="${team.name}">
+                            </option>
+                        </select>
+                        <div class="form-text">Equipo que jugará como local.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="awayTeamId" class="form-label">Equipo visitante</label>
+                        <select id="awayTeamId" class="form-select"
+                                th:field="*{awayTeamId}" required>
+                            <option value="" disabled>Selecciona el equipo visitante</option>
+                            <option th:each="team : ${teams}"
+                                    th:value="${team.id}"
+                                    th:text="${team.name}">
+                            </option>
+                        </select>
+                        <div class="form-text">Equipo que jugará como visitante.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Hora del partido</label>
+                        <input id="date" type="time" class="form-control"
+                               th:field="*{date}" required>
+                    </div>
+
+                    <input type="hidden" th:field="*{matchdayId}">
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-lg me-1"></i> Guardar partido
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{manage/layout :: footer}"></div>
+<script src="/js/matchdayScript.js"></script>
+</body>
+</html>

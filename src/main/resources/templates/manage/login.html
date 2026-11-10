@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+
+        <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+            <div class="row">
+                <div class="alert alert-success" th:if="${message != null}" th:text="${message}" role="alert">
+                </div>
+                <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+                </div>
+            </div>
+            <div class="text-center">
+                <img th:src="@{/img/logo.png}" class="rounded w-75" alt="Logo gameday">
+            </div>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        Username
+                    </label>
+
+                    <input type="text" class="form-control" id="username" name="username">
+
+                    <div id="emailHelp" class="form-text">
+                        We'll never share your email with anyone else.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        Password
+                    </label>
+
+                    <input type="password" class="form-control" id="password" name="password">
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+
+                    <label class="form-check-label" for="exampleCheck1">
+                        Check me out
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+            </form>
+        </div>
+
+    </div>
+    <div th:replace="~{manage/layout :: footer}"></div>
+</body>
+
+</html>

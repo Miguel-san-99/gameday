@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+    <div class="container">
+
+        <!--HEADER-->
+        <div class="row py-4 mb-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/tournament}">Competencia</a></li>
+                        <li class="breadcrumb-item"><a
+                                th:href="@{/admin/tournament/{tournamentId} (tournamentId=${tournamentId}) }">Administrar torneo</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Administrar jornada
+                        </li>
+                    </ol>
+                </nav>
+                <form th:action="@{/logout}" method="post" class="mb-0">
+                    <button class="btn btn-danger" type="submit">
+                        <i class="bi bi-box-arrow-right me-1"></i>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="alert alert-success" th:if="${message != null}" th:text="${message}" role="alert">
+            </div>
+            <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <h2 th:text="${matchday.name}"></h2>
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#agregarPartidoModal">
+                    Agregar partido
+                </button>
+            </div>
+
+            <!--Modal-->
+            <div class="modal fade" id="agregarPartidoModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="agregarPartidoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="agregarPartidoLabel">Agregar partido</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form
+                                th:action="@{/admin/match/register-match}"
+                                th:object="${matchForm}" method="post">
+
+                                <input type="hidden" th:field="*{matchdayId}">
+
+                                <div class="row g-3 mb-3">
+                                    <label for="teamLocal">Equipo local</label>
+                                    <select class="form-select" aria-label="team select" th:field="*{homeTeamId}"
+                                        id="teamLocal">
+                                        <option th:each="team : ${teams}" th:text="${team.name}"
+                                            th:value="${team.id}"></option>
+                                    </select>
+                                    <label for="teamVisita">Equipo visitante</label>
+                                    <select class="form-select" aria-label="team select" th:field="*{awayTeamId}"
+                                        id="teamVisita">
+                                        <option th:each="team : ${teams}" th:text="${team.name}"
+                                            th:value="${team.id}"></option>
+                                    </select>
+                                    <label for="fecha">Hora</label>
+                                    <input id="fecha" type="time" class="form-control" placeholder="Hora"
+                                        th:field="*{date}">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-hover caption-top align-middle">
+                    <caption class="table-light" th:text="${matchday.date}"></caption>
+                    <thead>
+                        <th class="text-center">Finalizado</th>
+                        <th class="text-end">Local</th>
+                        <th class="text-center">Marcador</th>
+                        <th class="text-start">Visitante</th>
+                        <th>Accion</th>
+                    </thead>
+                    <tbody>
+                        <tr th:each="match : ${matches}">
+                            <td class="text-center" th:classappend="${match.played} ? 'text-success' : 'text-danger'">
+                                <i class="bi bi-circle-fill"></i>
+                            </td>
+                            <td class="text-end">
+                                <span th:text="${match.homeTeamName}"></span>
+                            </td>
+                            <td class="text-center">
+                                <span th:text="${match.date}"></span>
+                                <h5>
+                                    <strong>
+                                        <span th:text="${match.homeGoals}"></span>
+                                        -
+                                        <span th:text="${match.awayGoals}"></span>
+                                    </strong>
+                                </h5>
+                            </td>
+                            <td class="text-start">
+                                <span th:text="${match.awayTeamName}"></span>
+                            </td>
+                            <td>
+                                <!-- Edit button trigger modal -->
+                                <a class="btn btn-outline-secondary" th:href="@{/admin/match/{matchId} (matchId = ${match.id})}" role="button">Editar</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{manage/layout :: footer}"></div>
+</body>
+
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+
+    <div class="container">
+
+        <!--HEADER-->
+        <div class="row py-4 mb-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/tournament}">Competencia</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Administrar torneo
+                        </li>
+                    </ol>
+                </nav>
+                <form th:action="@{/logout}" method="post" class="mb-0">
+                    <button class="btn btn-danger" type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!--ALERTS-->
+        <div class="row">
+            <div class="alert alert-success" th:if="${message != null}" th:text="${message}" role="alert">
+            </div>
+            <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+            </div>
+        </div>
+
+        <div class="row">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-teams-tab" data-bs-toggle="tab"
+                        data-bs-target="#nav-teams" type="button" role="tab" aria-controls="nav-teams"
+                        aria-selected="true">Equipos</button>
+                    <button class="nav-link" id="nav-matchdays-tab" data-bs-toggle="tab" data-bs-target="#nav-matchdays"
+                        type="button" role="tab" aria-controls="nav-matchdays" aria-selected="false">Jornadas</button>
+                    <button class="nav-link" id="nav-matches-tab" data-bs-toggle="tab" data-bs-target="#nav-matches"
+                        type="button" role="tab" aria-controls="nav-matches" aria-selected="false">Partidos</button>
+                    <button class="nav-link" id="nav-config-tab" data-bs-toggle="tab" data-bs-target="#nav-config"
+                        type="button" role="tab" aria-controls="nav-config" aria-selected="false"
+                        disabled>Configuracion</button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+
+                <!--EQUIPOS-->
+                <div class="tab-pane fade show active" id="nav-teams" role="tabpanel"
+                    aria-labelledby="nav-teams-tab" tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h2>Equipos</h2>
+
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#agregarEquipoModal">
+                            Agregar equipo
+                        </button>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="agregarEquipoModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                        tabindex="-1" aria-labelledby="agregarEquipoLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="agregarEquipoLabel">Agregar Equipo</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form
+                                        th:action="@{/admin/team/register-team}"
+                                        th:object="${teamForm}" method="post">
+
+                                        <input type="hidden" th:field="*{tournamentId}">
+
+                                        <div class="row g-3 mb-3">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="teamName" placeholder="Nombre"
+                                                    th:field="*{name}">
+                                                <label for="teamName">Nombre del equipo</label>
+                                            </div>
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="managerName" placeholder="Nombre del manager"
+                                                    th:field="*{managerName}">
+                                                <label for="managerName">Nombre del manager</label>
+                                            </div>
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="password" placeholder="Contraseña"
+                                                    th:field="*{password}">
+                                                <label for="password">Contraseña</label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Registrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--TABLA DE EQUIPOS-->
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Manager</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            <tr th:each="team : ${teams}">
+                                <td th:text="${team.id}"></td>
+                                <td th:text="${team.name}"></td>
+                                <td th:text="${team.manager.name}"></td>
+                                <td>
+                                    <!-- Edit button trigger modal -->
+                                    <a class="btn btn-outline-secondary" th:href="@{/admin/team/{teamId} (teamId = ${team.id})}" role="button">Editar</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--JORNADAS-->
+                <div class="tab-pane fade" id="nav-matchdays" role="tabpanel" aria-labelledby="nav-matchdays-tab"
+                    tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h2>Jornadas</h2>
+
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#agregarJornadaModal">
+                            Agregar jornada
+                        </button>
+                    </div>
+
+                    <!--Modal-->
+                    <div class="modal fade" id="agregarJornadaModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                        tabindex="-1" aria-labelledby="agregarJornadaLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="agregarJornadaLabel">Agregar jornada</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form
+                                        th:action="@{/admin/matchday/register-matchday}"
+                                        th:object="${matchdayForm}" method="post">
+
+                                        <input type="hidden" th:field="*{tournamentId}">
+
+                                        <div class="row g-3 mb-3">
+                                            <label for="matchdayName">Nombre</label>
+                                            <select class="form-select" aria-label="nombre select" th:field="*{name}"
+                                                id="matchdayName">
+                                                <option th:value="${nextMatchday}" th:text="${nextMatchday}">
+                                                </option>
+                                                <option value="4tos de final">4tos de final</option>
+                                                <option value="Semi-final">Semi-final</option>
+                                                <option value="Final">Final</option>
+                                            </select>
+                                            <label for="matchdayDate">Fecha</label>
+                                            <input type="date" class="form-control" id="matchdayDate" placeholder="Fecha"
+                                                th:field="*{date}">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Registrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--TABLA DE JORNADAS-->
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Fecha</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            <tr th:each="matchday : ${matchdays}">
+                                <td th:text="${matchday.id}"></td>
+                                <td th:text="${matchday.name}"></td>
+                                <td th:text="${matchday.date}"></td>
+                                <td>
+                                    <!-- Edit button trigger modal -->
+                                    <a class="btn btn-outline-secondary" th:href="@{/admin/matchday/{matchdayId}(matchdayId=${matchday.id})}" role="button">Editar</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!--PARTIDOS-->
+                <div class="tab-pane fade" id="nav-matches" role="tabpanel" aria-labelledby="nav-matches-tab"
+                    tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h2>Partidos</h2>
+                    </div>
+                </div>
+
+                <!--CONFIGURACION-->
+                <div class="tab-pane fade" id="nav-config" role="tabpanel" aria-labelledby="nav-config-tab"
+                    tabindex="0">
+                    Configuracion
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div th:replace="~{manage/layout :: footer}"></div>
+</body>
+
+</html>

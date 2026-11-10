@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+    <div class="container">
+
+        <div class="row py-4 mb-5">
+
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Competencia
+                    </li>
+                </ol>
+            </nav>
+
+        </div>
+
+        <div class="row">
+            <div class="alert alert-success" th:if="${message != null}" th:text="${message}" role="alert">
+            </div>
+            <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+            </div>
+        </div>
+
+        <div class="row d-flex justify-content-center align-items-center">
+            <div class="col-11 col-sm-8 col-md-6 col-lg-4">
+                <h2 class="mb-3">Selecciona una competencia</h2>
+
+                <p class="text-muted mb-4">
+                    Debes seleccionar la conpetencia para continuar.
+                </p>
+                <select class="form-select" name="competitionId" th:hx-get="@{/admin/tournament/tournaments}"
+                    hx-target="#contenedorTorneos" hx-trigger="change" hx-include="this">
+                    <option selected>Selecciona una competencia</option>
+                    <option th:each="competition : ${competitions}" th:value="${competition.id}"
+                        th:text="${competition.name}">
+                    </option>
+                </select>
+                <button type="button" class="btn btn-success mt-3" data-bs-toggle="modal"
+                    data-bs-target="#agregarCompetenciaModal">
+                    Agregar competencia
+                </button>
+                <!-- Modal competition -->
+                <div class="modal fade" id="agregarCompetenciaModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="agregarCompetenciaModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="agregarCompetenciaLabel">Agregar Competencia</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form th:action="@{/admin/competition/register}" th:object="${competitionForm}"
+                                    method="post">
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="competitionName" placeholder="Nombre"
+                                                th:field="*{name}">
+                                            <label for="competitionName">Nombre</label>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Registrar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h2 class="mb-3 mt-3">Selecciona un torneo</h2>
+
+                <p class="text-muted mb-4">
+                    Debes seleccionar un torneo para continuar.
+                </p>
+                <div class="dropdown-center" id="contenedorTorneos">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false" disabled>
+                        Selecciona un torneo
+                    </button>
+                    <ul class="dropdown-menu">
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-success mt-3" data-bs-toggle="modal"
+                    data-bs-target="#agregarTorneoModal">
+                    Agregar torneo
+                </button>
+                <!-- Modal tournament -->
+                <div class="modal fade" id="agregarTorneoModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="agregarTorneoLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="agregarTorneoLabel">Agregar torneo</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form th:action="@{/admin/tournament/register}" th:object="${tournamentForm}" method="post">
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="tournamentName" placeholder="Nombre"
+                                                th:field="*{name}">
+                                            <label for="tournamentName">Nombre</label>
+                                        </div>
+                                        <label for="competition">Competencia</label>
+                                        <select class="form-select" aria-label="competition select"
+                                            th:field="*{competitionId}" id="competition">
+                                            <option th:each="competition : ${competitions}"
+                                                th:text="${competition.name}" th:value="${competition.id}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Registrar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{manage/layout :: footer}"></div>
+</body>
+
+</html>

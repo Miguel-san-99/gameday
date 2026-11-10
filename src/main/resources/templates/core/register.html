@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Day</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form th:action="@{/register}" th:object="${userForm}" method="post">
+
+        <label for="username">Username</label>
+        <input id="username" type="text" th:field="*{name}">
+        
+        <label for="password">Password</label>
+        <input id="password" type="password" th:field="*{password}">
+        
+        <input type="submit" value="Register">
+
+    </form>
+</body>
+</html>

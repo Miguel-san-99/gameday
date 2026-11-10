@@ -1,0 +1,25 @@
+<div id="matches-container" class="table-responsive" th:fragment="matches">
+    <table class="table table-hover caption-top align-middle">
+        <caption class="table-light" th:text="${matchday.date}"></caption>
+        <tbody>
+            <tr th:each="match : ${matchday.matches}">
+                <td class="text-end ">
+                    <span th:text="${match.homeTeamName}"></span>
+                </td>
+                <td class="text-center">
+                    <span th:text="${match.date}"></span>
+                    <h5>
+                        <strong>
+                            <span th:text="${match.homeGoals}"></span>
+                            -
+                            <span th:text="${match.awayGoals}"></span>
+                        </strong>
+                    </h5>
+                </td>
+                <td class="text-start">
+                    <span th:text="${match.awayTeamName}"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+    <div class="container">
+
+        <!--HEADER-->
+        <div class="row py-4 mb-3">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/tournament}">Competencia</a></li>
+                        <li class="breadcrumb-item"><a
+                                th:href="@{/admin/tournament/{tournamentId} (tournamentId=${tournamentId}) }">Administrar torneo</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Administrar equipo
+                        </li>
+                    </ol>
+                </nav>
+                <form th:action="@{/logout}" method="post" class="mb-0">
+                    <button class="btn btn-danger" type="submit">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!--ALERTS-->
+        <div class="row">
+            <div class="alert alert-success" th:if="${message != null}" th:text="${message}" role="alert">
+            </div>
+            <div class="alert alert-danger" role="alert" th:if="${error != null}" th:text="${error}">
+            </div>
+        </div>
+
+        <div class="row py-4 mb-3">
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <h2>Administrar equipo</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-7">
+                <form class="w-75" method="post" th:action="@{/admin/team/{teamId}/update-team (teamId=${teamId})}" th:object="${teamForm}">
+                    <div class="row mb-3">
+                        <label for="nombreEquipo" class="col-sm-4 col-form-label">Nombre del equipo</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="nombreEquipo" th:field="*{name}">
+                        </div>
+                    </div>
+                    <fieldset class="row mb-3">
+                        <legend class="col-form-label col-sm-4 pt-0">Estado</legend>
+                        <div class="col-sm-8">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" th:field="*{status}" id="estadoActivo"
+                                    value="ACTIVE">
+                                <label class="form-check-label" for="estadoActivo">
+                                    <span class="badge text-bg-success">Activo</span>
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" th:field="*{status}" id="estadoInactivo"
+                                    value="INACTIVE">
+                                <label class="form-check-label" for="estadoInactivo">
+                                    <span class="badge text-bg-danger">Inactivo</span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p>Manager</p>
+                    <div class="row mb-3">
+                        <label for="nombreManager" class="col-sm-4 col-form-label">Nombre del manager</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="nombreManager" th:field="*{managerName}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="passwordManager" class="col-sm-4 col-form-label">Actualizar contraseña</label>
+                        <div class="col-sm-8">
+                            <input type="password" class="form-control" id="passwordManager" th:field="*{managerPassword}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+            <div class="col-12 col-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <strong>Jugadores:</strong>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#agregarJugadorModal">
+                        <i class="bi bi-plus-lg"></i>
+                    </button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="agregarJugadorModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                        tabindex="-1" aria-labelledby="agregarJugadorLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="agregarJugadorLabel">Agregar Jugador</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form
+                                        th:action="@{/admin/team/{teamId}/register-player (teamId=${teamId})}"
+                                        th:object="${playerForm}" method="post">
+
+                                        <div class="row g-3 mb-3">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="nombre" placeholder="Nombre"
+                                                    th:field="*{name}">
+                                                <label for="nombre">Nombre del jugador</label>
+                                            </div>
+                                            <label for="fecha">Fecha de nacimiento</label>
+                                            <input type="date" class="form-control" id="fecha" placeholder="Fecha"
+                                                th:field="*{birthDate}">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Registrar</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        th:each="player : ${players}">
+                        <span th:text="${player.name}"></span>
+                        <i class="bi bi-person-fill"></i>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{manage/layout :: footer}"></div>
+</body>
+
+</html>

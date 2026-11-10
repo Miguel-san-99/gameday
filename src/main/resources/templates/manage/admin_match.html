@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{manage/layout :: head}"></head>
+
+<body>
+
+<div class="container pb-5">
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+    <div class="row py-4 mb-3">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/admin/tournament}">
+                            Competencia
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/admin/tournament/{tournamentId}
+                            (tournamentId=${tournamentId})}">
+                            Administrar torneo
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/admin/matchday/{matchdayId}
+                            (matchdayId=${matchdayId})}">
+                            Administrar jornada
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active"
+                        aria-current="page">
+                        Administrar partido
+                    </li>
+                </ol>
+            </nav>
+
+
+            <!-- LOGOUT -->
+            <form th:action="@{/logout}"
+                  method="post"
+                  class="mb-0">
+
+                <button class="btn btn-danger"
+                        type="submit">
+
+                    <i class="bi bi-box-arrow-right me-1"></i>
+                    Cerrar sesión
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         ALERTS
+    ========================================================== -->
+    <div class="row">
+
+        <div class="alert alert-success"
+             th:if="${message != null}"
+             th:text="${message}"
+             role="alert">
+
+        </div>
+
+        <div class="alert alert-danger"
+             th:if="${error != null}"
+             th:text="${error}"
+             role="alert">
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         TITLE
+    ========================================================== -->
+    <div class="row py-3">
+
+        <div class="col">
+
+            <h2 class="fw-bold mb-1">
+                Administrar partido
+            </h2>
+
+            <p class="text-muted mb-0">
+                Edita el resultado y las estadísticas de los jugadores.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         MATCH FORM
+    ========================================================== -->
+
+    <form id="matchForm"
+          th:action="@{/admin/match/{id}/update-match
+              (id=${matchId})}"
+          th:object="${matchForm}"
+          method="post">
+
+
+        <!-- =====================================================
+             MATCH INFORMATION CARD
+        ====================================================== -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body p-4">
+
+                <!-- TEAMS / SCORE -->
+                <div class="row align-items-center text-center g-3">
+
+
+                    <!-- HOME TEAM -->
+                    <div class="col-12 col-md-4">
+
+                        <div class="text-md-end">
+
+                            <div class="text-muted small mb-1">
+                                LOCAL
+                            </div>
+
+                            <h3 class="fw-bold mb-0"
+                                th:text="${matchForm.homeTeamName}">
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SCORE -->
+                    <div class="col-12 col-md-4">
+
+                        <div class="text-muted small mb-2">
+                            Resultado
+                        </div>
+
+                        <div class="d-flex justify-content-center
+                                    align-items-center gap-2">
+
+                            <input type="number"
+                                   class="form-control form-control-lg
+                                          text-center fw-bold score-input"
+                                   th:field="*{homeGoals}"
+                                   min="0"
+                                   max="99"
+                                   required>
+
+                            <span class="fs-3 fw-bold text-muted">
+                                -
+                            </span>
+
+                            <input type="number"
+                                   class="form-control form-control-lg
+                                          text-center fw-bold score-input"
+                                   th:field="*{awayGoals}"
+                                   min="0"
+                                   max="99"
+                                   required>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AWAY TEAM -->
+                    <div class="col-12 col-md-4">
+
+                        <div class="text-md-start">
+
+                            <div class="text-muted small mb-1">
+                                VISITANTE
+                            </div>
+
+                            <h3 class="fw-bold mb-0"
+                                th:text="${matchForm.awayTeamName}">
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <hr class="my-4">
+
+
+                <!-- DATE + PLAYED -->
+                <div class="row g-3">
+
+                    <!-- DATE -->
+                    <div class="col-12 col-md-6">
+
+                        <label for="date"
+                               class="form-label fw-semibold">
+
+                            Hora del partido
+
+                        </label>
+
+                        <input type="time"
+                               id="date"
+                               class="form-control"
+                               th:field="*{date}"
+                               required>
+
+                    </div>
+
+
+                    <!-- PLAYED -->
+                    <div class="col-12 col-md-6">
+
+                        <label class="form-label fw-semibold">
+                            Estado del partido
+                        </label>
+
+                        <div class="form-check form-switch mt-2">
+
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   role="switch"
+                                   id="played"
+                                   th:field="*{played}">
+
+                            <label class="form-check-label"
+                                   for="played">
+
+                                Partido jugado
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- NOTES -->
+                <div class="mt-4">
+
+                    <label for="notes"
+                           class="form-label fw-semibold">
+
+                        Notas
+
+                    </label>
+
+                    <textarea id="notes"
+                              class="form-control"
+                              th:field="*{notes}"
+                              rows="3"
+                              placeholder="Agrega alguna observación del partido...">
+                    </textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PLAYER STATS CARD
+        ====================================================== -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-4">
+
+                    <div>
+
+                        <h4 class="fw-bold mb-1">
+                            Estadísticas de jugadores
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Registra goles, minutos y tarjetas.
+                        </p>
+
+                    </div>
+
+                    <span class="badge text-bg-secondary"
+                          id="statsCounter">
+                        0 jugadores
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     ADD PLAYER
+                ================================================== -->
+
+                <div class="bg-light rounded-3 p-3 mb-4">
+
+                    <div class="row g-3 align-items-end">
+
+                        <!-- PLAYER -->
+                        <div class="col-12 col-lg-4">
+
+                            <label for="playerSelect"
+                                   class="form-label fw-semibold">
+
+                                Jugador
+
+                            </label>
+
+                            <select id="playerSelect"
+                                    class="form-select">
+
+                                <option value="">
+                                    Seleccionar jugador...
+                                </option>
+                                <option value="" disabled>Jugadores locales</option>
+                                <option th:each="player : ${homePlayers}"
+                                        th:value="${player.id}"
+                                        th:text="${player.name}">
+                                </option>
+                                <option value="" disabled>Jugadores visitantes</option>
+                                <option th:each="player : ${awayPlayers}"
+                                        th:value="${player.id}"
+                                        th:text="${player.name}">
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- GOALS -->
+                        <div class="col-6 col-lg-2">
+
+                            <label for="goalsInput"
+                                   class="form-label fw-semibold">
+
+                                Goles
+
+                            </label>
+
+                            <input type="number"
+                                   id="goalsInput"
+                                   class="form-control"
+                                   min="0"
+                                   max="20"
+                                   value="0">
+
+                        </div>
+
+
+                        <!-- YELLOW -->
+                        <div class="col-6 col-lg-2">
+
+                            <label for="yellowCardsInput"
+                                   class="form-label fw-semibold">
+
+                                Amarillas
+
+                            </label>
+
+                            <input type="number"
+                                   id="yellowCardsInput"
+                                   class="form-control"
+                                   min="0"
+                                   max="2"
+                                   value="0">
+
+                        </div>
+
+
+                        <!-- RED -->
+                        <div class="col-6 col-lg-2">
+
+                            <div class="form-check mb-2">
+
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="redCardInput">
+
+                                <label class="form-check-label"
+                                       for="redCardInput">
+
+                                    Tarjeta roja
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ADD BUTTON -->
+                        <div class="col-12">
+
+                            <button type="button"
+                                    id="addPlayerButton"
+                                    class="btn btn-primary">
+
+                                <i class="bi bi-plus-lg me-1"></i>
+
+                                Agregar jugador
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PLAYERS LIST
+                ================================================== -->
+
+                <div id="playerStatsContainer">
+
+                    <!--
+                        Existing statistics from the database.
+                        JavaScript will manage these elements.
+                    -->
+
+                    <div th:each="stat, i : ${matchForm.playersStats}"
+                         class="player-stat border rounded-3 p-3 mb-3"
+                         th:data-player-id="${stat.playerId}">
+
+                        <input type="hidden"
+                               th:field="*{playersStats[__${i.index}__].playerId}">
+
+
+                        <div class="row g-3 align-items-center">
+
+
+                            <!-- PLAYER NAME -->
+                            <div class="col-12 col-md-3">
+
+                                <div class="fw-semibold"
+                                     th:text="${stat.name}">
+                                </div>
+
+                            </div>
+
+                            <!-- GOALS -->
+                            <div class="col-6 col-md-2">
+
+                                <label class="form-label small text-muted">
+                                    Goles
+                                </label>
+
+                                <input type="number"
+                                       class="form-control stat-goals"
+                                       th:field="*{playersStats[__${i.index}__].goals}"
+                                       min="0"
+                                       max="20">
+
+                            </div>
+
+
+                            <!-- YELLOW CARDS -->
+                            <div class="col-6 col-md-2">
+
+                                <label class="form-label small text-muted">
+                                    Amarillas
+                                </label>
+
+                                <input type="number"
+                                       class="form-control stat-yellow"
+                                       th:field="*{playersStats[__${i.index}__].yellowCards}"
+                                       min="0"
+                                       max="2">
+
+                            </div>
+
+
+                            <!-- RED CARD -->
+                            <div class="col-6 col-md-2">
+
+                                <div class="form-check">
+
+                                    <input class="form-check-input stat-red"
+                                           type="checkbox"
+                                           th:field="*{playersStats[__${i.index}__].redCard}">
+
+                                    <label class="form-check-label">
+
+                                        Tarjeta roja
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- DELETE -->
+                            <div class="col-12 col-md-1 text-md-end">
+
+                                <button type="button"
+                                        class="btn btn-outline-danger
+                                               btn-sm remove-player"
+                                        title="Eliminar jugador">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMPTY MESSAGE -->
+
+                <div id="emptyStatsMessage"
+                     class="text-center text-muted py-4 d-none">
+
+                    <i class="bi bi-people fs-2 d-block mb-2"></i>
+
+                    <span>
+                        Todavía no hay estadísticas registradas.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             SAVE BUTTON
+        ====================================================== -->
+
+        <div class="d-flex flex-column flex-sm-row
+                    justify-content-end gap-2">
+
+            <a th:href="@{/admin/matchday/{matchdayId}
+                         (matchdayId=${matchdayId})}"
+               class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Cancelar
+
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary px-4">
+
+                <i class="bi bi-check-lg me-1"></i>
+                Guardar cambios
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div th:replace="~{manage/layout :: footer}"></div>
+<script src="/js/matchScript.js"></script>
+</body>
+</html>

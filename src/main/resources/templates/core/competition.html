@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{core/layout :: head}"></head>
+    <body>
+        <div th:replace="~{core/layout :: header}"></div>
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-md-2">
+                        <h1 th:text="${tournament.competitionName}"></h1>
+                        <div class="row mb-3">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" th:text="${tournament.name}">
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li th:each="tournamentSelect : ${tournaments} ">
+                                        <a class="dropdown-item"
+                                            th:classappend="${tournamentSelect.id == tournament.id} ? ' active' : ''"
+                                            th:href="@{/tournament/{tournamentId}(tournamentId=${tournamentSelect.id})}"
+                                            th:text="${tournamentSelect.name}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="list-example" class="list-group">
+                                <a class="list-group-item list-group-item-action" href="#leaderboard">Tabla de posiciones</a>
+                                <a class="list-group-item list-group-item-action" href="#matchdays">Jornadas</a>
+                                <a class="list-group-item list-group-item-action" href="#stats">Estadisticas</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-10">
+                        <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
+                            <!--TABLA DE POSICIONES-->
+                            <div class="row" id="leaderboard">
+                                <h2>Tabla de posiciones</h2>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>POSICION/EQUIPO</th>
+                                                <th>PJ</th>
+                                                <th>PG</th>
+                                                <th>PE</th>
+                                                <th>PP</th>
+                                                <th>GF</th>
+                                                <th>GC</th>
+                                                <th>DG</th>
+                                                <th>Puntos</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="row, stat : ${leaderboard}">
+                                                <td th:text="${stat.count + ' - ' + row.name}"></td>
+                                                <td th:text="${row.pj}"></td>
+                                                <td th:text="${row.pg}"></td>
+                                                <td th:text="${row.pe}"></td>
+                                                <td th:text="${row.pp}"></td>
+                                                <td th:text="${row.gf}"></td>
+                                                <td th:text="${row.gc}"></td>
+                                                <td th:text="${row.dg}"></td>
+                                                <td><strong th:text="${row.pts}"></strong></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!--JORNADAS-->
+                            <div class="row" id="matchdays">
+                                <div class="col-md-9">
+                                    <h2>Jornadas</h2>
+                                </div>
+                                <div class="col-md-3">
+                                    <button id="matchday-name" class="btn btn-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown">
+                                        Selecciona una jornada
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li th:each="matchdaySelect : ${tournament.matchdays}">
+                                            <a class="dropdown-item" th:text="${matchdaySelect.name}" th:hx-get="@{/matches/{matchdayId} (matchdayId=${matchdaySelect.id})}"
+                                                hx-target="#matches-container" hx-swap="outerHTML"
+                                                hx-on="click: document.getElementById('matchday-name').innerText=this.innerText">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div id="matches-container" class="table-responsive" th:replace="~{fragments/matches :: matches}"></div>
+                            </div>
+                            <div class="row" id="stats">
+                                <div>
+                                    <h2>Estadisticas</h2>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4 mb-4">
+                                        <div class="card" style="width: 18rem;">
+                                            <div class="card-header">
+                                                <strong>Más Victorias</strong>
+                                            </div>
+                                            <ul class="list-group list-group-numbered">
+
+                                                <li th:each="row : ${winList}" class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div th:text="${row.name}" class="ms-2 me-auto">
+                                                        
+                                                    </div>
+                                                    <span th:text="${row.pg}" class="badge text-bg-primary rounded-pill"></span>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 mb-4">
+                                        <div class="card" style="width: 18rem;">
+                                            <div class="card-header">
+                                                <strong>Más Empates</strong>
+                                            </div>
+                                            <ul class="list-group list-group-numbered">
+
+                                                <li th:each="row : ${drawList}" class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div th:text="${row.name}" class="ms-2 me-auto">
+                                                    </div>
+                                                    <span th:text="${row.pe}" class="badge text-bg-primary rounded-pill"></span>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 mb-4">
+                                        <div class="card" style="width: 18rem;">
+                                            <div class="card-header">
+                                                <strong>Más Derrotas</strong>
+                                            </div>
+                                            <ul class="list-group list-group-numbered">
+                                                <li th:each="row : ${defeatList}" class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div th:text="${row.name}" class="ms-2 me-auto">
+                                                    </div>
+                                                    <span th:text="${row.pp}" class="badge text-bg-primary rounded-pill"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 mb-4">
+                                        <div class="card" style="width: 18rem;">
+                                            <div class="card-header">
+                                                <strong>Más Goles Anotados</strong>
+                                            </div>
+                                            <ul class="list-group list-group-numbered">
+                                                <li th:each="row : ${goalsScored}" class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div th:text="${row.name}" class="ms-2 me-auto">
+                                                    </div>
+                                                    <span th:text="${row.gf}" class="badge text-bg-primary rounded-pill"></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4 mb-4">
+                                        <div class="card" style="width: 18rem;">
+                                            <div class="card-header">
+                                                <strong>Más Goles Recibidos</strong>
+                                            </div>
+                                            <ul class="list-group list-group-numbered">
+
+                                                <li th:each="row : ${goalsRecived}" class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div th:text="${row.name}" class="ms-2 me-auto">
+                                                    </div>
+                                                    <span th:text="${row.gc}" class="badge text-bg-primary rounded-pill"></span>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div th:replace="~{core/layout :: footer}"></div>
+    </body>
+</html>
