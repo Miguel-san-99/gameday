@@ -33,4 +33,4 @@ build/
 .vscode/
 
 #Excluir configuración real con credenciales
-**/src/resources/application.properties
+**/src/main/resources/application.properties
