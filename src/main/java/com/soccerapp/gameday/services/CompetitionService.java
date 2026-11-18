@@ -1,13 +1,14 @@
 package com.soccerapp.gameday.services;
 
 import com.soccerapp.gameday.dtos.CompetitionDto;
+import com.soccerapp.gameday.exceptions.DuplicateResourceException;
+import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.CompetitionMapper;
 import com.soccerapp.gameday.models.Competition;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import com.soccerapp.gameday.repositories.CompetitionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -28,20 +29,25 @@ public class CompetitionService {
     
     @Transactional(readOnly = true)
     public Competition getCompetitionById(Long id) {
-        return competitionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe la competencia con id: " + id));
+        return competitionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con id: " + id, "/admin/tournament"));
     }
 
     @Transactional(readOnly = true)
     public CompetitionDto getCompetitionDtoById(Long id) {
-        Competition competition = competitionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe la competencia con id: " + id));
-        return competitionMapper.toDto(competition);
+        return competitionMapper.toDto(getCompetitionById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Competition getCompetitionByName(String name) {
+        return competitionRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con nombre: " + name, "/admin/tournament"));
     }
     
     @Transactional
     public Competition saveCompetition(CompetitionDto request) {
-        if (request == null) {
-            throw new IllegalArgumentException("La competencia no puede ser null.");
+        if (competitionRepository.findByName(request.getName()) != null) {
+            throw new DuplicateResourceException("Ya existe una competencia con este nombre.", "/admin/tournament");
         }
-        return competitionRepository.save(competitionMapper.toEntity(request));
+        Competition competition = competitionMapper.toEntity(request);
+        return competitionRepository.save(competition);
     }
 }

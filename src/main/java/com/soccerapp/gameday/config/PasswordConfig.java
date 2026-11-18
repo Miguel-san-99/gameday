@@ -1,4 +1,4 @@
-package com.soccerapp.gameday.security;
+package com.soccerapp.gameday.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -2,6 +2,8 @@ package com.soccerapp.gameday.services;
 
 import com.soccerapp.gameday.dtos.RegisterUserRequest;
 import com.soccerapp.gameday.enums.Role;
+import com.soccerapp.gameday.exceptions.BusinessException;
+import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.UserMapper;
 import com.soccerapp.gameday.models.User;
 import com.soccerapp.gameday.repositories.TeamRepository;
@@ -27,18 +29,18 @@ public class UserService {
     
     @Transactional(readOnly = true)
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el usuario con id: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con id: " + id, "/login"));
     }
     
     @Transactional(readOnly = true)
     public User getUserByName(String name) {
-        return userRepository.findByName(name);
+        return userRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con nombre: " + name, "/login"));
     }
     
     @Transactional
     public User saveUserAdmin(RegisterUserRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("El usuario no puede ser null.");
+        if (request.getName().isBlank() || request.getPassword().isBlank()) {
+            throw new BusinessException("username y contraseña no pueden quedar en blanco.", "/register");
         }
         User user = userMapper.toEntity(request);
         user.setRole(Role.ADMIN);
@@ -48,8 +50,8 @@ public class UserService {
 
     @Transactional
     public User saveUserManager(RegisterUserRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("El usuario no puede ser null.");
+        if (request.getName().isBlank() || request.getPassword().isBlank()) {
+            throw new BusinessException("username y contraseña no pueden quedar en blanco.", "/register");
         }
         User user = userMapper.toEntity(request);
         user.setRole(Role.MANAGER);
@@ -59,7 +61,9 @@ public class UserService {
 
     public User updateUser(Long id, String managerName, String managerPassword) {
         User user = this.getUserById(id);
-        user.setName(managerName);
+        if (!managerName.isBlank()) {
+            user.setName(managerName);
+        }
         if (managerPassword != null || !managerPassword.isBlank()) {
             user.setPassword(passwordEncoder.encode(managerPassword));
         }

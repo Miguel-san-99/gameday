@@ -21,14 +21,9 @@ public class CompetitionController {
 
     @PostMapping("/register")
     public String registerCompetition(@ModelAttribute("competitionForm") CompetitionDto request, RedirectAttributes redirectAttributes) {
-        try {
-            competitionService.saveCompetition(request);
-            redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente la competencia");
-            return "redirect:/admin/tournament";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/tournament";
-        }
+        competitionService.saveCompetition(request);
+        redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente la competencia");
+        return "redirect:/admin/tournament";
     }
 
 }

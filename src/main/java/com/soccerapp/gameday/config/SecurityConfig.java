@@ -1,4 +1,4 @@
-package com.soccerapp.gameday.security;
+package com.soccerapp.gameday.config;
 
 import com.soccerapp.gameday.enums.Role;
 import com.soccerapp.gameday.services.UserService;
