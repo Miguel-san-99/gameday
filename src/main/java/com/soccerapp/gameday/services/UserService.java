@@ -29,12 +29,12 @@ public class UserService {
     
     @Transactional(readOnly = true)
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con id: " + id, "/login"));
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con id: " + id));
     }
     
     @Transactional(readOnly = true)
     public User getUserByName(String name) {
-        return userRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con nombre: " + name, "/login"));
+        return userRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con nombre: " + name));
     }
     
     @Transactional

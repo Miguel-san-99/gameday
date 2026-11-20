@@ -10,13 +10,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public String handleResourceNotFound(ResourceNotFoundException ex, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("error", ex.getMessage());
-        return "redirect:" + ex.getRedirectUri();
+    public ModelAndView handleResourceNotFound(ResourceNotFoundException ex) {
+        ModelAndView mav = new ModelAndView("error/404");
+        mav.addObject("message", ex.getMessage());
+        mav.setStatus(HttpStatus.NOT_FOUND);
+        return mav;
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
     public String handleDuplicateResource(DuplicateResourceException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:" + ex.getRedirectUri();
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public String handleBusiness(BusinessException ex, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("error", ex.getMessage());
         return "redirect:" + ex.getRedirectUri();
     }
@@ -29,7 +37,8 @@ public class GlobalExceptionHandler {
 
         mav.addObject(
                 "message",
-                "Ha ocurrido un error inesperado. Inténtalo nuevamente."
+                "Ha ocurrido un error inesperado. Inténtalo nuevamente. " +
+                        ex.getMessage()
         );
 
         mav.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);

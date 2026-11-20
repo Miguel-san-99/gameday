@@ -1,6 +1,7 @@
 package com.soccerapp.gameday.services;
 
 import com.soccerapp.gameday.dtos.CompetitionDto;
+import com.soccerapp.gameday.exceptions.BusinessException;
 import com.soccerapp.gameday.exceptions.DuplicateResourceException;
 import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.CompetitionMapper;
@@ -29,7 +30,7 @@ public class CompetitionService {
     
     @Transactional(readOnly = true)
     public Competition getCompetitionById(Long id) {
-        return competitionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con id: " + id, "/admin/tournament"));
+        return competitionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con id: " + id));
     }
 
     @Transactional(readOnly = true)
@@ -39,12 +40,15 @@ public class CompetitionService {
 
     @Transactional(readOnly = true)
     public Competition getCompetitionByName(String name) {
-        return competitionRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con nombre: " + name, "/admin/tournament"));
+        return competitionRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con nombre: " + name));
     }
     
     @Transactional
     public Competition saveCompetition(CompetitionDto request) {
-        if (competitionRepository.findByName(request.getName()) != null) {
+        if (request.getName().isBlank()) {
+            throw new BusinessException("No puedes dejar el nombre de la competencia en blanco.", "/admin/tournament");
+        }
+        if (!competitionRepository.findByName(request.getName()).isEmpty()) {
             throw new DuplicateResourceException("Ya existe una competencia con este nombre.", "/admin/tournament");
         }
         Competition competition = competitionMapper.toEntity(request);

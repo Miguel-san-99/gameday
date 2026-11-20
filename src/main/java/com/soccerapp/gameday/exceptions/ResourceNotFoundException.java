@@ -1,13 +1,7 @@
 package com.soccerapp.gameday.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException {
-    private final String redirectUri;
-    public ResourceNotFoundException(String message, String redirectUri) {
+    public ResourceNotFoundException(String message) {
         super(message);
-        this.redirectUri = redirectUri;
-    }
-
-    public String getRedirectUri() {
-        return redirectUri;
     }
 }
