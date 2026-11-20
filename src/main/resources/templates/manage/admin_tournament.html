@@ -84,17 +84,17 @@
                                         <div class="row g-3 mb-3">
                                             <div class="form-floating">
                                                 <input type="text" class="form-control" id="teamName" placeholder="Nombre"
-                                                    th:field="*{name}">
+                                                    th:field="*{name}" required>
                                                 <label for="teamName">Nombre del equipo</label>
                                             </div>
                                             <div class="form-floating">
                                                 <input type="text" class="form-control" id="managerName" placeholder="Nombre del manager"
-                                                    th:field="*{managerName}">
+                                                    th:field="*{managerName}" required>
                                                 <label for="managerName">Nombre del manager</label>
                                             </div>
                                             <div class="form-floating">
                                                 <input type="text" class="form-control" id="password" placeholder="Contraseña"
-                                                    th:field="*{password}">
+                                                    th:field="*{password}" required>
                                                 <label for="password">Contraseña</label>
                                             </div>
                                         </div>

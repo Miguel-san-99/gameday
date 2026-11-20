@@ -17,6 +17,14 @@ public class GlobalExceptionHandler {
         return mav;
     }
 
+    @ExceptionHandler(InvalidRequestException.class)
+    public ModelAndView handleInvalidRequest(InvalidRequestException ex) {
+        ModelAndView mav = new ModelAndView("error/400");
+        mav.addObject("message", ex.getMessage());
+        mav.setStatus(HttpStatus.BAD_REQUEST);
+        return mav;
+    }
+
     @ExceptionHandler(DuplicateResourceException.class)
     public String handleDuplicateResource(DuplicateResourceException ex, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("error", ex.getMessage());

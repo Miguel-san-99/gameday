@@ -66,14 +66,9 @@ public class TeamController {
 
     @PostMapping("/register-team")
     public String registerTeam(@ModelAttribute("teamForm") RegisterTeamRequest request, RedirectAttributes redirectAttributes) {
-        try {
-            teamService.saveTeam(request);
-            redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el equipo");
-            return "redirect:/admin/tournament/" + request.getTournamentId();
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/tournament/" + request.getTournamentId();
-        }
+        teamService.saveTeam(request);
+        redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el equipo");
+        return "redirect:/admin/tournament/" + request.getTournamentId();
     }
 
     @PostMapping("/{teamId}/update-team")

@@ -5,6 +5,8 @@ import com.soccerapp.gameday.dtos.RegisterUserRequest;
 import com.soccerapp.gameday.dtos.TeamDto;
 import com.soccerapp.gameday.dtos.UpdateTeamRequest;
 import com.soccerapp.gameday.enums.TeamStatus;
+import com.soccerapp.gameday.exceptions.InvalidRequestException;
+import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.TeamMapper;
 import com.soccerapp.gameday.models.Team;
 import com.soccerapp.gameday.models.Tournament;
@@ -19,14 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeamService {
     
     private final TeamRepository teamRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final TeamMapper teamMapper;
     private final TournamentService tournamentService;
 
-    public TeamService(TeamRepository teamRepository, PasswordEncoder passwordEncoder, UserService userService, TeamMapper teamMapper, TournamentService tournamentService) {
+    public TeamService(TeamRepository teamRepository, UserService userService, TeamMapper teamMapper, TournamentService tournamentService) {
         this.teamRepository = teamRepository;
-        this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.teamMapper = teamMapper;
         this.tournamentService = tournamentService;
@@ -34,12 +34,14 @@ public class TeamService {
     
     @Transactional(readOnly = true)
     public Team getTeamById(Long id) {
-        return teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el equipo con el id: " + id));
+        if (id == null) {
+            throw new InvalidRequestException("El ID del equipo es obligatorio.");
+        }
+        return teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el equipo con el id: " + id));
     }
 
     public TeamDto getTeamDtoById(Long id) {
-        Team team = teamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el equipo con el id: " + id));
-        return teamMapper.toDto(team);
+        return teamMapper.toDto(getTeamById(id));
     }
 
     @Transactional
@@ -52,7 +54,7 @@ public class TeamService {
         RegisterUserRequest managerRequest = new RegisterUserRequest();
         managerRequest.setName(request.getManagerName());
         managerRequest.setPassword(request.getPassword());
-        User manager = userService.saveUserManager(managerRequest);
+        User manager = userService.saveUserManager(managerRequest, request.getTournamentId());
         team.setManager(manager);
         return teamRepository.save(team);
     }

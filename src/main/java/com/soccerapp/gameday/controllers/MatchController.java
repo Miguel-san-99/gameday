@@ -44,14 +44,9 @@ public class MatchController {
 
     @PostMapping("/register-match")
     public String registerMatch(@ModelAttribute("matchForm") RegisterMatchRequest matchRequest, RedirectAttributes redirectAttributes) {
-        try {
-            matchService.saveMatch(matchRequest);
-            redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el partido");
-            return "redirect:/admin/matchday/" + matchRequest.getMatchdayId();
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/matchday/" + matchRequest.getMatchdayId();
-        }
+        matchService.saveMatch(matchRequest);
+        redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el partido");
+        return "redirect:/admin/matchday/" + matchRequest.getMatchdayId();
     }
 
     @PostMapping("/{matchId}/update-match")

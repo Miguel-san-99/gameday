@@ -21,7 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TeamRepository teamRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
@@ -49,9 +49,9 @@ public class UserService {
     }
 
     @Transactional
-    public User saveUserManager(RegisterUserRequest request) {
+    public User saveUserManager(RegisterUserRequest request, Long tournamentId) {
         if (request.getName().isBlank() || request.getPassword().isBlank()) {
-            throw new BusinessException("username y contraseña no pueden quedar en blanco.", "/register");
+            throw new BusinessException("username y contraseña no pueden quedar en blanco.", "/admin/tournament/" + tournamentId);
         }
         User user = userMapper.toEntity(request);
         user.setRole(Role.MANAGER);
