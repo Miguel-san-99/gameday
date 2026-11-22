@@ -1,6 +1,8 @@
 package com.soccerapp.gameday.mappers;
 
+import com.soccerapp.gameday.dtos.RegisterTournamentRequest;
 import com.soccerapp.gameday.dtos.TournamentDto;
+import com.soccerapp.gameday.models.Competition;
 import com.soccerapp.gameday.models.Tournament;
 import org.springframework.stereotype.Component;
 
@@ -29,5 +31,12 @@ public class TournamentMapper {
 
     public List<TournamentDto> toDtoList(List<Tournament> tournaments) {
         return tournaments.stream().map(this::toDto).toList();
+    }
+
+    public Tournament toEntity(RegisterTournamentRequest request, Competition competition) {
+        Tournament tournament = new Tournament();
+        tournament.setName(request.getName());
+        tournament.setCompetition(competition);
+        return tournament;
     }
 }

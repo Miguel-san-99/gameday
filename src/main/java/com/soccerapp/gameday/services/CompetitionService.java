@@ -1,6 +1,7 @@
 package com.soccerapp.gameday.services;
 
 import com.soccerapp.gameday.dtos.CompetitionDto;
+import com.soccerapp.gameday.dtos.RegisterCompetitionRequest;
 import com.soccerapp.gameday.exceptions.BusinessException;
 import com.soccerapp.gameday.exceptions.DuplicateResourceException;
 import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
@@ -44,7 +45,7 @@ public class CompetitionService {
     }
     
     @Transactional
-    public Competition saveCompetition(CompetitionDto request) {
+    public Competition saveCompetition(RegisterCompetitionRequest request) {
         if (request.getName().isBlank()) {
             throw new BusinessException("No puedes dejar el nombre de la competencia en blanco.", "/admin/tournament");
         }

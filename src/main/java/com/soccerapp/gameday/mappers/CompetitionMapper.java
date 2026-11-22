@@ -1,6 +1,7 @@
 package com.soccerapp.gameday.mappers;
 
 import com.soccerapp.gameday.dtos.CompetitionDto;
+import com.soccerapp.gameday.dtos.RegisterCompetitionRequest;
 import com.soccerapp.gameday.models.Competition;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +23,9 @@ public class CompetitionMapper {
         return dto;
     }
 
-    public Competition toEntity(CompetitionDto competitionDto) {
+    public Competition toEntity(RegisterCompetitionRequest CompetitionRequest) {
         Competition competition = new Competition();
-        competition.setName(competitionDto.getName());
+        competition.setName(CompetitionRequest.getName());
         return competition;
     }
 

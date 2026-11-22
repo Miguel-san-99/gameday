@@ -46,13 +46,8 @@ public class MatchdayController {
 
     @PostMapping("/register-matchday")
     public String registerMatchday(@ModelAttribute("matchdayForm") RegisterMatchdayRequest request, RedirectAttributes redirectAttributes) {
-        try {
-            matchdayService.saveMatchday(request);
-            redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente la jornada");
-            return "redirect:/admin/tournament/" + request.getTournamentId();
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/tournament/" + request.getTournamentId();
-        }
+        matchdayService.saveMatchday(request);
+        redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente la jornada");
+        return "redirect:/admin/tournament/" + request.getTournamentId();
     }
 }

@@ -1,6 +1,7 @@
 package com.soccerapp.gameday.controllers;
 
 import com.soccerapp.gameday.dtos.CompetitionDto;
+import com.soccerapp.gameday.dtos.RegisterCompetitionRequest;
 import com.soccerapp.gameday.mappers.CompetitionMapper;
 import com.soccerapp.gameday.models.Competition;
 import com.soccerapp.gameday.services.CompetitionService;
@@ -15,12 +16,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CompetitionController {
     private final CompetitionService competitionService;
 
-    public CompetitionController(CompetitionService competitionService, CompetitionMapper competitionMapper) {
+    public CompetitionController(CompetitionService competitionService) {
         this.competitionService = competitionService;
     }
 
     @PostMapping("/register")
-    public String registerCompetition(@ModelAttribute("competitionForm") CompetitionDto request, RedirectAttributes redirectAttributes) {
+    public String registerCompetition(@ModelAttribute("competitionForm") RegisterCompetitionRequest request, RedirectAttributes redirectAttributes) {
         competitionService.saveCompetition(request);
         redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente la competencia");
         return "redirect:/admin/tournament";

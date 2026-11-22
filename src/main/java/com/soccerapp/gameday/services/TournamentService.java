@@ -1,9 +1,13 @@
 package com.soccerapp.gameday.services;
 
+import com.soccerapp.gameday.dtos.RegisterTournamentRequest;
 import com.soccerapp.gameday.dtos.TeamStatsRequest;
 import com.soccerapp.gameday.dtos.TournamentDto;
 import com.soccerapp.gameday.enums.TeamStatus;
+import com.soccerapp.gameday.exceptions.BusinessException;
+import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.TournamentMapper;
+import com.soccerapp.gameday.models.Competition;
 import com.soccerapp.gameday.models.Team;
 import com.soccerapp.gameday.models.Match;
 import com.soccerapp.gameday.models.Tournament;
@@ -20,10 +24,12 @@ public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
     private final TournamentMapper tournamentMapper;
+    private final CompetitionService competitionService;
 
-    public TournamentService(TournamentRepository tournamentRepository, TournamentMapper tournamentMapper) {
+    public TournamentService(TournamentRepository tournamentRepository, TournamentMapper tournamentMapper, CompetitionService competitionService) {
         this.tournamentRepository = tournamentRepository;
         this.tournamentMapper = tournamentMapper;
+        this.competitionService = competitionService;
     }
 
     @Transactional(readOnly = true)
@@ -33,20 +39,21 @@ public class TournamentService {
 
     @Transactional(readOnly = true)
     public Tournament getTournamentById(Long id) {
-        return tournamentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el torneo con id: " + id));
+        return tournamentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el torneo con id: " + id));
     }
 
     @Transactional(readOnly = true)
     public TournamentDto getTournamentDtoById(Long id) {
-        Tournament tournament = tournamentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el torneo con id: " + id));
-        return tournamentMapper.toDto(tournament);
+        return tournamentMapper.toDto(getTournamentById(id));
     }
     
     @Transactional
-    public Tournament saveTournament(Tournament tournament) {
-        if (tournament == null) {
-            throw new IllegalArgumentException("El torneo no puede ser null.");
+    public Tournament saveTournament(RegisterTournamentRequest request) {
+        if (request.getName().isBlank()) {
+            throw new BusinessException("No puedes dejar en blanco el nombre del torneo.",  "/admin/tournament");
         }
+        Competition competition = competitionService.getCompetitionById(request.getCompetitionId());
+        Tournament tournament = tournamentMapper.toEntity(request, competition);
         return tournamentRepository.save(tournament);
     }
     

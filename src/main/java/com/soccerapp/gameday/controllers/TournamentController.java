@@ -1,10 +1,7 @@
 package com.soccerapp.gameday.controllers;
 
 
-import com.soccerapp.gameday.dtos.CompetitionDto;
-import com.soccerapp.gameday.dtos.RegisterMatchdayRequest;
-import com.soccerapp.gameday.dtos.RegisterTeamRequest;
-import com.soccerapp.gameday.dtos.RegisterTournamentRequest;
+import com.soccerapp.gameday.dtos.*;
 import com.soccerapp.gameday.models.Competition;
 import com.soccerapp.gameday.models.Team;
 import com.soccerapp.gameday.models.Tournament;
@@ -30,11 +27,12 @@ public class TournamentController {
 
     @GetMapping
     public String tournamentSelection(Model model) {
-        model.addAttribute("competitionForm", new CompetitionDto());
+        model.addAttribute("competitionForm", new RegisterCompetitionRequest());
         model.addAttribute("tournamentForm", new RegisterTournamentRequest());
         return "manage/tournament_selection";
     }
 
+    //ToDo Esta clase manda entidades en lugar de dtos, --Cambiar entidades por dtos!!!
     @GetMapping("/{tournamentId}")
     public String adminTournament(@PathVariable Long tournamentId, Model model) {
         Tournament tournament = tournamentService.getTournamentById(tournamentId);
@@ -66,17 +64,9 @@ public class TournamentController {
 
     @PostMapping("/register")
     public String registerTournament(@ModelAttribute("tournamentForm") RegisterTournamentRequest request, RedirectAttributes redirectAttributes) {
-        try {
-            Tournament tournament = new Tournament();
-            tournament.setName(request.getName());
-            tournament.setCompetition(competitionService.getCompetitionById(request.getCompetitionId()));
-            tournamentService.saveTournament(tournament);
-            redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el torneo");
-            return "redirect:/admin/tournament";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/tournament";
-        }
+        tournamentService.saveTournament(request);
+        redirectAttributes.addFlashAttribute("message", "Se ha registrado exitosamente el torneo");
+        return "redirect:/admin/tournament";
     }
 
 }
