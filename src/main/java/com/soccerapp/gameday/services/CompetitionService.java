@@ -4,6 +4,7 @@ import com.soccerapp.gameday.dtos.CompetitionDto;
 import com.soccerapp.gameday.dtos.RegisterCompetitionRequest;
 import com.soccerapp.gameday.exceptions.BusinessException;
 import com.soccerapp.gameday.exceptions.DuplicateResourceException;
+import com.soccerapp.gameday.exceptions.InvalidRequestException;
 import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.CompetitionMapper;
 import com.soccerapp.gameday.models.Competition;
@@ -31,6 +32,9 @@ public class CompetitionService {
     
     @Transactional(readOnly = true)
     public Competition getCompetitionById(Long id) {
+        if (id == null) {
+            throw new InvalidRequestException("El ID del partido es obligatorio.");
+        }
         return competitionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe la competencia con id: " + id));
     }
 

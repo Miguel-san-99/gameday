@@ -3,6 +3,7 @@ package com.soccerapp.gameday.services;
 import com.soccerapp.gameday.dtos.MatchdayDto;
 import com.soccerapp.gameday.dtos.RegisterMatchdayRequest;
 import com.soccerapp.gameday.exceptions.BusinessException;
+import com.soccerapp.gameday.exceptions.InvalidRequestException;
 import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.MatchdayMapper;
 import com.soccerapp.gameday.models.Matchday;
@@ -29,6 +30,9 @@ public class MatchdayService {
     
     @Transactional(readOnly = true)
     public Matchday getMatchdayById(Long id) {
+        if (id == null) {
+            throw new InvalidRequestException("El ID de la jornada es obligatorio.");
+        }
         return matchdayRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe la jornada con id: " + id));
     }
 

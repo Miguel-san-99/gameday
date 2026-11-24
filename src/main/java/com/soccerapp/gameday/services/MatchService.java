@@ -4,6 +4,8 @@ import com.soccerapp.gameday.dtos.MatchDto;
 import com.soccerapp.gameday.dtos.PlayerMatchStatDto;
 import com.soccerapp.gameday.dtos.RegisterMatchRequest;
 import com.soccerapp.gameday.dtos.UpdateMatchRequest;
+import com.soccerapp.gameday.exceptions.InvalidRequestException;
+import com.soccerapp.gameday.exceptions.ResourceNotFoundException;
 import com.soccerapp.gameday.mappers.MatchMapper;
 import com.soccerapp.gameday.mappers.PlayerMatchStatMapper;
 import com.soccerapp.gameday.models.Match;
@@ -36,19 +38,21 @@ public class MatchService {
     
     @Transactional(readOnly = true)
     public Match getMatchById(Long id) {
-        return matchRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el partido con id: " + id));
+        if (id == null) {
+            throw new InvalidRequestException("El ID del partido es obligatorio.");
+        }
+        return matchRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No existe el partido con id: " + id));
     }
 
     @Transactional(readOnly = true)
     public MatchDto getMatchDtoById(Long id) {
-        Match match = matchRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No existe el partido con id: " + id));
-        return matchMapper.toDto(match);
+        return matchMapper.toDto(getMatchById(id));
     }
     
     @Transactional
     public MatchDto saveMatch(RegisterMatchRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("El partido no puede ser null.");
+        if (request.getDate() == null) {
+            throw new InvalidRequestException("Ingresa una fecha valida.");
         }
         Team homeTeam = teamService.getTeamById(request.getHomeTeamId());
         Team awayTeam = teamService.getTeamById(request.getAwayTeamId());
@@ -67,8 +71,7 @@ public class MatchService {
 
     @Transactional
     public MatchDto updateMatch(Long matchId, UpdateMatchRequest matchRequest) {
-
-        Match match = matchMapper.update(matchRequest, this.getMatchById(matchId));
+        Match match = matchMapper.update(matchRequest, getMatchById(matchId));
         match.removeAllPlayerMatchStats();
         if (matchRequest.getPlayersStats() != null) {
             for (PlayerMatchStatDto playerMatchStatDto : matchRequest.getPlayersStats()) {

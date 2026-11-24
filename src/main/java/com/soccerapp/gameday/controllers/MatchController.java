@@ -11,10 +11,12 @@ import com.soccerapp.gameday.models.Matchday;
 import com.soccerapp.gameday.models.Team;
 import com.soccerapp.gameday.services.MatchService;
 import com.soccerapp.gameday.services.TeamService;
+import jakarta.validation.Valid;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -50,15 +52,10 @@ public class MatchController {
     }
 
     @PostMapping("/{matchId}/update-match")
-    public String updateMatch(@PathVariable Long matchId, @ModelAttribute("matchForm") UpdateMatchRequest matchRequest, RedirectAttributes redirectAttributes) {
-        try {
-            matchService.updateMatch(matchId, matchRequest);
-            redirectAttributes.addFlashAttribute("message", "Se han registrado exitosamente los resultados");
-            return "redirect:/admin/match/" + matchId;
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/match/" + matchId;
-        }
+    public String updateMatch(@PathVariable Long matchId, @ModelAttribute("matchForm") UpdateMatchRequest matchRequest ,RedirectAttributes redirectAttributes) {
+        matchService.updateMatch(matchId, matchRequest);
+        redirectAttributes.addFlashAttribute("message", "Se han registrado exitosamente los resultados");
+        return "redirect:/admin/match/" + matchId;
     }
 
     @PostMapping("/{matchId}/delete-match")
